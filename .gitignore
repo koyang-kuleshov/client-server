@@ -8,6 +8,9 @@ __pycache__/
 *.gz
 *.zip
 *.rar
+*.json
+*.yaml
+*.txt
 src/
 output/
 img/
