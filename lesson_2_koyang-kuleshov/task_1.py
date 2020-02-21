@@ -22,6 +22,7 @@ import re
 
 
 def get_data():
+    """Функция создаёт словарь для записи"""
     os_prod_list = list()
     os_name_list = list()
     os_code_list = list()
@@ -57,6 +58,7 @@ def get_data():
 
 
 def write_to_csv(file_obj):
+    """Функция записывает словарь в файл"""
     with open(file_obj, 'w') as f_writer:
         f_writer = csv.writer(f_writer, quoting=csv.QUOTE_ALL)
         for row in get_data():
