@@ -19,6 +19,7 @@ b) Создать функцию write_to_csv(), в которую переда�
 c) Проверить работу программы через вызов функции write_to_csv()"""
 import csv
 import re
+from chardet import detect
 
 
 def get_data():
@@ -32,8 +33,9 @@ def get_data():
              r'Код продукта:\s+', r'Тип системы:\s+']
     for spam_file in FILES:
         with open(spam_file, 'rb') as tmp_f:
+            enc = detect(tmp_f.read())['encoding']
+            tmp_f.seek(0)
             for line in tmp_f.readlines():
-                enc = 'cp1251'
                 line = line.decode(enc)
                 line = line.encode('utf-8').decode('utf-8')
                 for counter, reg in enumerate(REGEX):
