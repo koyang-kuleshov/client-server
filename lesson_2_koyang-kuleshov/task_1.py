@@ -21,6 +21,7 @@ import csv
 import re
 from chardet import detect
 
+sdfsfd
 
 def get_data():
     """Функция создаёт словарь для записи"""
