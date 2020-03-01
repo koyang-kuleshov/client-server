@@ -17,22 +17,17 @@ from common.variables import PRESENCE, DEFAULT_IP_ADDRES, DEFAULT_PORT, \
 from common.utils import get_message, send_message
 
 
+class ArgumentParserError(Exception):
+    print('Не указан обязательный параметр')
+
+class ThrowingArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ArgumentParserError(message)
+
 def create_presence(account_n):
     """Создаёт запрос о присутствии клиента на сервере"""
     out = {
         ACTION: PRESENCE,
-        TIME: time(),
-        USER: {
-            ACCOUNT_NAME: account_n
-        }
-    }
-    return out
-
-
-def disconnect(account_n):
-    """Создаёт запрос на отключение от сервера"""
-    out = {
-        ACTION: QUIT,
         TIME: time(),
         USER: {
             ACCOUNT_NAME: account_n
@@ -51,17 +46,15 @@ def process_answer(message):
 
 
 def main():
-    pars_str = argparse.ArgumentParser('Считывает данные для подключения \
+    pars_str = ThrowingArgumentParser('Считывает данные для подключения \
 клиента')
     pars_str.add_argument(
         'addr',
         type=str,
-        default=DEFAULT_IP_ADDRES,
         help='IP-адрес сервера, по умолчанию 127.0.0.1'
     )
-    pars_str.add_argument('port', type=int, default=DEFAULT_PORT, help='\
-                        Порт сервера, по умолчанию 7777')
-    args = pars_str.parse_args()
+    pars_str.add_argument('-port', type=int, help='Порт сервера, по умолчанию \
+        7777')
     try:
         ADDRES = pars_str.parse_args().addr
         PORT = pars_str.parse_args().port
@@ -69,31 +62,25 @@ def main():
             raise ValueError
     except ValueError:
         print('Номер порта должен быть в диапазоне от 1024 до 65535')
+    except ArgumentParserError:
+        print('Вы не указали IP-адрес, будет использован по умолчанию')
+        ADDRES = DEFAULT_IP_ADDRES
+        PORT = DEFAULT_PORT
 
     CLIENT = socket(AF_INET, SOCK_STREAM)
     CLIENT.connect((ADDRES, PORT))
 
-    while True:
-        action = input('с - подключиться к серверу\nd - отключиться от сервера\
-\nq - выйти\nЧто нужно выполнить: ')
-        account_name = input('Введите имя пользователя( Enter - имя по \
-умолчанию): ')
-        if account_name == '':
-            account_name = 'Guest'
-        if action == 'c' or action == 'с':
-            message_to_server = create_presence(account_name)
-            send_message(CLIENT, message_to_server)
-        elif action == 'd':
-            print(f'Отключение от сервера {args.addr}:{args.port}')
-            message_to_server = disconnect(account_name)
-            send_message(CLIENT, message_to_server)
-        elif action == 'q':
-            break
-        try:
-            server_answer = process_answer(get_message(CLIENT))
-            print(server_answer)
-        except (ValueError, json.JSONDecodeError):
-            print('Не удалось декодировать сообщение от сервера')
+    account_name = input('Введите имя пользователя для подключения\
+( Enter - имя по умолчанию): ')
+    if account_name == '':
+        account_name = 'Guest'
+    message_to_server = create_presence(account_name)
+    send_message(CLIENT, message_to_server)
+    try:
+        server_answer = process_answer(get_message(CLIENT))
+        print(f'Ответ сервера - {server_answer}')
+    except (ValueError, json.JSONDecodeError):
+        print('Не удалось декодировать сообщение от сервера')
 
 
 if __name__ == '__main__':

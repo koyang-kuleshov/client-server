@@ -3,7 +3,7 @@
 import argparse
 import subprocess
 from sys import platform
-from common.variables import DEFAULT_IP_ADDRES, DEFAULT_PORT, DEFAULT_USERS
+from common.variables import DEFAULT_IP_ADDRES, DEFAULT_PORT, MAX_CONNECTIONS
 
 
 process = list()
@@ -11,7 +11,7 @@ number_of_client = argparse.ArgumentParser('Считывает количест�
                                            для запуска')
 number_of_client.add_argument(
     '-n',
-    type=int, default=DEFAULT_USERS,
+    type=int, default=MAX_CONNECTIONS,
     help='Введите количество клиентов для запуска -n=2, по умолчанию 1'
 )
 n = number_of_client.parse_args().n
@@ -34,7 +34,7 @@ x - закрыть все окна\nВведите действие: ')
                 )
         else:
             process.append(subprocess.Popen(f'python server.py \
--a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT}', shell=True, stdout=True))
+-a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT} -u=n', shell=True))
             for i in range(n):
                 process.append(subprocess.Popen(
                     'python client.py',
