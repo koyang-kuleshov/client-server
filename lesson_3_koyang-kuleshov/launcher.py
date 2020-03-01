@@ -3,24 +3,28 @@
 import argparse
 import subprocess
 from sys import platform
+from common.variables import DEFAULT_IP_ADDRES, DEFAULT_PORT, DEFAULT_USERS
 
 
 process = list()
 number_of_client = argparse.ArgumentParser('Считывает количество клиентов \
                                            для запуска')
-number_of_client.add_argument('-n', '--n', type=int, default=2, help='Введите \
-                        количество клиентов для запуска --n=2, по умолчанию 1')
+number_of_client.add_argument(
+    '-n',
+    type=int, default=DEFAULT_USERS,
+    help='Введите количество клиентов для запуска -n=2, по умолчанию 1'
+)
 n = number_of_client.parse_args().n
-os_sys = platform
 while True:
     action = input('q - выход\ns - запустить сервер и клиенты\n\
 x - закрыть все окна\nВведите действие: ')
     if action == 'q':
         break
     elif action == 's':
-        if os_sys != 'linux':
+        if platform != 'linux':
             process.append(subprocess.Popen(
-                'python server.py',
+                f'python server.py -a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT} \
+                -u=n',
                 creationflags=subprocess.CREATE_NEW_CONSOLE)
             )
             for i in range(n):
@@ -29,7 +33,8 @@ x - закрыть все окна\nВведите действие: ')
                     creationflags=subprocess.CREATE_NEW_CONSOLE)
                 )
         else:
-            process.append(subprocess.Popen('python server.py', shell=True))
+            process.append(subprocess.Popen(f'python server.py \
+-a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT}', shell=True, stdout=True))
             for i in range(n):
                 process.append(subprocess.Popen(
                     'python client.py',
