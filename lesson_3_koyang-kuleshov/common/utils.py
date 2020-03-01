@@ -4,12 +4,12 @@ import json
 from common.variables import MAX_PACKAGE_LENGTH, ENCODING
 
 
-def get_message(client):
+def get_message(decoded_sock):
     """Принимает и декодирует сообщение
     :param client:
     :return:
     """
-    encoded_response = client.recv(MAX_PACKAGE_LENGTH)
+    encoded_response = decoded_sock.recv(MAX_PACKAGE_LENGTH)
     if isinstance(encoded_response, bytes):
         json_response = encoded_response.decode(ENCODING)
         response = json.loads(json_response)
