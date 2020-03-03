@@ -13,16 +13,18 @@ import json
 from time import time
 from socket import socket, AF_INET, SOCK_STREAM
 from common.variables import PRESENCE, DEFAULT_IP_ADDRES, DEFAULT_PORT, \
-    USER, ACCOUNT_NAME, TIME, RESPONSE, ERROR, QUIT, ACTION
+    USER, ACCOUNT_NAME, TIME, RESPONSE, ERROR, ACTION
 from common.utils import get_message, send_message
 
 
 class ArgumentParserError(Exception):
-    print('Не указан обязательный параметр')
+    pass
+
 
 class ThrowingArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         raise ArgumentParserError(message)
+
 
 def create_presence(account_n):
     """Создаёт запрос о присутствии клиента на сервере"""
