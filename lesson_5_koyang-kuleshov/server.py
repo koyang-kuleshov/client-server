@@ -14,13 +14,21 @@ from socket import socket, AF_INET, SOCK_STREAM
 from common.variables import DEFAULT_PORT, DEFAULT_IP_ADDRES, MAX_CONNECTIONS,\
     ACTION, PRESENCE, TIME, USER, RESPONSE, ERROR, ACCOUNT_NAME
 from common.utils import get_message, send_message
+import logging
+import logs.server_log_config
+
+
+SERV_LOG = logging.getLogger('server.log')
 
 
 def do_answer(message):
+    SERV_LOG.debug('Обработка сообщения от клиента и подготовка ответа')
     """Обрабатывает сообщение от клиента и готовит ответ"""
     if ACTION in message and message[ACTION] == PRESENCE and TIME in message \
             and USER in message:
+        SERV_LOG.debug('Ответ подготовлен: {RESPONSE: 200}')
         return {RESPONSE: 200}
+    SERV_LOG.debug("Ответ подготовлен: {RESPONSE: 400\nERROR: 'Bad Request'}")
     return {
         RESPONSE: 400,
         ERROR: 'Bad Request'
@@ -29,6 +37,7 @@ def do_answer(message):
 
 def main():
     """Запускает сервер"""
+    SERV_LOG.debug('Запуск сервера')
     pars_str = argparse.ArgumentParser('Считывает TCP-порт и IP-адрес')
     pars_str.add_argument(
         '-a',
@@ -44,12 +53,15 @@ def main():
         help='Количество пользователей на сервере'
     )
     try:
+        SERV_LOG.debug('Разбираются параметры командой строки при вызове')
         ADDRES = pars_str.parse_args().a
         PORT = pars_str.parse_args().p
         CONNECTIONS = pars_str.parse_args().u
         if PORT < 1024 or PORT > 65535 or not isinstance(PORT, int):
+            SERV_LOG.info('Порт задан не верно')
             raise ValueError
     except ValueError:
+        SERV_LOG.info('Порт задан по умолчанию')
         print('Номер порта должен быть в диапазоне от 1024 до 65535')
 
     SERV = socket(AF_INET, SOCK_STREAM)
@@ -58,16 +70,17 @@ def main():
     while True:
         client, addr = SERV.accept()
         try:
+            SERV_LOG.debug('Разберается сообщение от клиента')
             client_message = get_message(client)
             response = do_answer(client_message)
             send_message(client, response)
             client.close()
             spam_time = datetime.datetime.fromtimestamp(
                 client_message[TIME])
-            print(f'{spam_time.strftime("%H:%M:%S")}\
+            SERV_LOG.info(f'{spam_time.strftime("%H:%M:%S")}\
  : Пользователь {client_message[USER][ACCOUNT_NAME]} подключился')
         except (ValueError, json.JSONDecodeError):
-            print('Принято некорректное сообщение от клиента')
+            SERV_LOG.error('Принято некорректное сообщение от клиента')
             client.close()
 
 
