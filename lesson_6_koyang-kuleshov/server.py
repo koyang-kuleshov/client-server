@@ -16,11 +16,13 @@ from common.variables import DEFAULT_PORT, DEFAULT_IP_ADDRES, MAX_CONNECTIONS,\
 from common.utils import get_message, send_message
 import logging
 import logs.server_log_config
+from unit_tests.decorators import log
 
 
 SERV_LOG = logging.getLogger('server.log')
 
 
+@log
 def do_answer(message):
     SERV_LOG.debug('Обработка сообщения от клиента и подготовка ответа')
     """Обрабатывает сообщение от клиента и готовит ответ"""
@@ -35,7 +37,7 @@ def do_answer(message):
     }
 
 
-def main():
+def server_main():
     """Запускает сервер"""
     SERV_LOG.debug('Запуск сервера')
     pars_str = argparse.ArgumentParser('Считывает TCP-порт и IP-адрес')
@@ -85,4 +87,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    server_main()

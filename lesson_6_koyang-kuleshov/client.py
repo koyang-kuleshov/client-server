@@ -17,6 +17,7 @@ from common.variables import PRESENCE, DEFAULT_IP_ADDRES, DEFAULT_PORT, \
 from common.utils import get_message, send_message
 import logging
 import logs.client_log_config
+from unit_tests.decorators import Log
 
 
 CLIENT_LOG = logging.getLogger('client.log')
@@ -32,6 +33,7 @@ class ThrowingArgumentParser(argparse.ArgumentParser):
         raise ArgumentParserError(message)
 
 
+@Log()
 def create_presence(account_n):
     """Создание запроса о присутствии клиента на сервере"""
     CLIENT_LOG.debug('Создание запроса о присутствии клиента на сервере')
@@ -45,6 +47,7 @@ def create_presence(account_n):
     return out
 
 
+@Log()
 def process_answer(message):
     """Обрабатка сообщения сервера"""
     CLIENT_LOG.debug('Обрабатка сообщения сервера')
@@ -58,7 +61,7 @@ def process_answer(message):
     raise ValueError
 
 
-def main():
+def client_main():
     pars_str = ThrowingArgumentParser('Считывает данные для подключения \
 клиента')
     pars_str.add_argument(
@@ -101,4 +104,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    client_main()
