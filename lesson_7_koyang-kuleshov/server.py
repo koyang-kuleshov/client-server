@@ -12,7 +12,7 @@ import argparse
 import datetime
 from socket import socket, AF_INET, SOCK_STREAM
 from common.variables import DEFAULT_PORT, DEFAULT_IP_ADDRES, MAX_CONNECTIONS,\
-    ACTION, PRESENCE, TIME, USER, RESPONSE, ERROR, ACCOUNT_NAME
+    ACTION, PRESENCE, TIME, USER, RESPONSE, ERROR, ACCOUNT_NAME, TO
 from common.utils import get_message, send_message
 import logging
 import logs.server_log_config
@@ -26,8 +26,8 @@ SERV_LOG = logging.getLogger('server.log')
 def do_answer(message):
     SERV_LOG.debug('Обработка сообщения от клиента и подготовка ответа')
     """Обрабатывает сообщение от клиента и готовит ответ"""
-    if ACTION in message and message[ACTION] == PRESENCE and TIME in message \
-            and USER in message:
+    if ACTION in message and message[ACTION] == PRESENCE and TO in message \
+            and TIME in message and USER in message:
         SERV_LOG.debug('Ответ подготовлен: {RESPONSE: 200}')
         return {RESPONSE: 200}
     SERV_LOG.debug("Ответ подготовлен: {RESPONSE: 400\nERROR: 'Bad Request'}")

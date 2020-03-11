@@ -17,7 +17,7 @@ from common.variables import PRESENCE, DEFAULT_IP_ADDRES, DEFAULT_PORT, \
 from common.utils import get_message, send_message
 import logging
 import logs.client_log_config
-from unit_tests.decorators import Log
+from decorators import Log
 
 
 CLIENT_LOG = logging.getLogger('client.log')
