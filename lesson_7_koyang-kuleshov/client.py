@@ -13,6 +13,7 @@ import logging
 from socket import socket, AF_INET, SOCK_STREAM
 from time import time
 import sys
+from datetime import datetime
 
 from common.utils import send_message, get_message
 from common.variables import PRESENCE, DEFAULT_IP_ADDRES, DEFAULT_PORT, \
@@ -83,9 +84,10 @@ def create_presence(account_n):
 def get_user_answer(message):
     """Обрабатка сообщения сервера"""
     CLIENT_LOG.debug('Обрабатка сообщения сервера')
-    if ACTION in message and ACTION[message] == MSG:
-        user_msg = f'Сообщение от пользователя {message[SENDER]}: \
-{message[MESSAGE]}'
+    if ACTION in message and message[ACTION] == MSG:
+        time_mess = datetime.fromtimestamp(message[TIME]).strftime("%H:%M:%S")
+        user_msg = f'[{time_mess}] \
+{message[SENDER]}: {message[MESSAGE]}'
         print(f'{user_msg}')
         CLIENT_LOG.info(f'{user_msg}')
     else:
@@ -98,7 +100,8 @@ def create_message(sock, account_n):
     message = input('Введите сообщение( для выхода введите !!!): ')
     if message == '!!!':
         sock.close()
-        CLIENT_LOG.info('Завершение работы по команде пользователя.')
+        CLIENT_LOG.info('Завершение работы по команде пользователя')
+        sys.exit(1)
     out = {
         ACTION: MSG,
         TO: '',
@@ -108,23 +111,23 @@ def create_message(sock, account_n):
         },
         MESSAGE: message
     }
-    CLIENT_LOG.info('Сформировано сообщение.')
+    CLIENT_LOG.info('Сформировано сообщение')
     return out
 
 
 def client_main():
     ADDRES, PORT, MODE, account_name = parse_comm_line()
     if MODE == 'listen':
-        print('Режим работы: приём сообщений.')
+        print('Режим работы: приём сообщений')
     else:
-        print('Режим работы: отправка сообщений.')
+        print('Режим работы: отправка сообщений')
 
     CLIENT = socket(AF_INET, SOCK_STREAM)
     CLIENT.connect((ADDRES, PORT))
     while True:
         if MODE == 'send':
             try:
-                send_message(CLIENT, create_message(CLIENT))
+                send_message(CLIENT, create_message(CLIENT, account_name))
             except (ConnectionResetError, ConnectionError,
                     ConnectionAbortedError):
                 CLIENT_LOG.error(f'Соединение с сервером {ADDRES} было \

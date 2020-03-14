@@ -42,6 +42,4 @@ STR_HAND = logging.StreamHandler(sys.stderr)
 STR_HAND.setLevel(LOGGING_LEVEL)
 STR_HAND.setFormatter(_formatter)
 
-if __name__ == '__main__':
-    LOG.addHandler(STR_HAND)
-    LOG.debug('Server logger start at testing mode')
+LOG.addHandler(STR_HAND)
