@@ -2,8 +2,9 @@
 
 import argparse
 import subprocess
+from time import sleep
 from sys import platform
-from common.variables import DEFAULT_IP_ADDRES, DEFAULT_PORT, MAX_CONNECTIONS
+from common.variables import MAX_CONNECTIONS
 
 
 process = list()
@@ -12,7 +13,7 @@ number_of_client = argparse.ArgumentParser('Считывает количест�
 number_of_client.add_argument(
     '-n',
     type=int, default=MAX_CONNECTIONS,
-    help='Введите количество клиентов для запуска -n=3, по умолчанию 2'
+    help='Введите количество клиентов для запуска -n=2, по умолчанию 6'
 )
 n = number_of_client.parse_args().n
 while True:
@@ -23,35 +24,40 @@ x - закрыть все окна\nВведите действие: ')
     elif action == 's':
         if platform != 'linux':
             process.append(subprocess.Popen(
-                f'python server.py -a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT} \
-                -u=n',
+                f'python server.py',
                 creationflags=subprocess.CREATE_NEW_CONSOLE)
             )
-            for i in range(n):
+            for i in range(n // 3):
                 name = 'Guest'+str(i + 1)
                 process.append(subprocess.Popen(
-                    f'python client.py -m -mode=send -name={name}',
+                    f'python client.py -mode=send -name={name}',
                     creationflags=subprocess.CREATE_NEW_CONSOLE)
                 )
-            for i in range(n):
+            for i in range(n // 3):
                 process.append(subprocess.Popen(
-                    'python client.py -m -mode=listen',
+                    'python client.py -mode=listen',
                     creationflags=subprocess.CREATE_NEW_CONSOLE)
                 )
         else:
-            process.append(subprocess.Popen(f'python server.py \
--a={DEFAULT_IP_ADDRES} -p={DEFAULT_PORT} -u=n', shell=True))
-            for i in range(n):
+            process.append(subprocess.Popen(
+                f'xterm -e python server.py', stdout=subprocess.PIPE,
+                stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True))
+            sleep(1)
+            for i in range(n // 3):
                 name = 'Guest'+str(i + 1)
                 process.append(subprocess.Popen(
-                    f'python client.py -m -mode=send -name={name}',
-                    shell=True)
+                    f'xterm -e python client.py -mode=send -name={name}',
+                    stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                    stderr=subprocess.STDOUT, shell=True)
                 )
-            for i in range(n):
+                sleep(1)
+            for i in range(n // 3):
                 process.append(subprocess.Popen(
-                    'python client.py -m -mode=listen',
-                    shell=True)
+                    'xterm -e python client.py -mode=listen',
+                    stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                    stderr=subprocess.STDOUT, shell=True)
                 )
+                sleep(1)
     elif action == 'x' or action == 'х':
         while process:
             victim = process.pop()

@@ -97,6 +97,7 @@ def get_user_answer(message):
 @Log()
 def create_message(sock, account_n):
     CLIENT_LOG.info('Создание сообщения пользователя')
+    print(f'Имя пользователя: {account_n}')
     message = input('Введите сообщение( для выхода введите !!!): ')
     if message == '!!!':
         sock.close()
