@@ -149,21 +149,24 @@ def user_interactive(sock, account_n):
     """Запрашивает команды и отправляет сообщения"""
     print_menu()
     while True:
-        action = input('Введите команду: ')
+        action = input('Введите команду: ').lower()
         if action == 'i' or action == 'ш':
             create_message(sock, account_n)
-        elif action == 'x' or action == 'х' or action == 'ч':
+        elif action == 'q' or action == 'й':
             send_message(sock, create_exit(account_n))
             print('Завершение соединения')
             CLIENT_LOG.info('Завершение соединения пользователем')
             sleep(0.5)
+            break
+        else:
+            print('Команда не распознана попробуйте i или x')
 
 
 def print_menu():
     """Выводит список команд"""
     print('Меню команд:')
     print('i - отправить сообщение пользователю')
-    print('x - выход')
+    print('q - выход')
 
 
 def client_main():

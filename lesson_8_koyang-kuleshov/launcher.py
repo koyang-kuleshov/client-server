@@ -28,7 +28,7 @@ x - закрыть все окна\nВведите действие: ')
                 creationflags=subprocess.CREATE_NEW_CONSOLE)
             )
             for i in range(n // 3):
-                name = 'Guest'+str(i + 1)
+                name = 'User'+str(i + 1)
                 process.append(subprocess.Popen(
                     ['python', 'client.py', f'-name={name}'],
                     creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -39,9 +39,9 @@ x - закрыть все окна\nВведите действие: ')
                 stdin=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True))
             sleep(1)
             for i in range(n // 3):
-                name = 'Guest'+str(i + 1)
+                name = 'User'+str(i + 1)
                 process.append(subprocess.Popen(
-                    'xterm -e python client.py f"-name={name}"',
+                    f'xterm -e python client.py -name={name}',
                     stdout=subprocess.PIPE, stdin=subprocess.PIPE,
                     stderr=subprocess.STDOUT, shell=True)
                 )

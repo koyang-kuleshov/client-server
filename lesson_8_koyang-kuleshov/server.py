@@ -11,6 +11,7 @@ import argparse
 import logging
 from select import select
 from socket import socket, AF_INET, SOCK_STREAM
+from time import sleep
 
 from common.utils import get_message, send_message
 from common.variables import DEFAULT_PORT, DEFAULT_IP_ADDRES, MAX_CONNECTIONS,\
@@ -95,7 +96,7 @@ def do_answer(message, message_list, client, clients, names):
 def do_message(message, names, socks):
     """Отправляет сообщение определённому клиенту"""
     if message[TO] in names and names[message[TO]] in socks:
-        send_message(names[TO], message)
+        send_message(names[message[TO]], message)
         SERV_LOG.info(f'Отправлено сообщение пользователю {message[TO]} '
                       f' от пользователя {message[SENDER]}')
     elif message[TO] in names and names[message[TO]] not in socks:
@@ -110,10 +111,18 @@ def server_main():
     SERV_LOG.debug('Запуск сервера')
     ADDRES, PORT, CONNECTIONS = parse_comm_line()
     SERV = socket(AF_INET, SOCK_STREAM)
-    SERV.bind((ADDRES, PORT))
+    while True:
+        try:
+            SERV.bind((ADDRES, PORT))
+            print(f'Сервер запущен {ADDRES}:{PORT}')
+            break
+        except OSError as err:
+            print(f'Порт занят. Повторная попытка запуска сервера через 10 \
+сек.')
+            SERV_LOG.debug(f'Ошибка при запуске сервера: {err}')
+            sleep(10)
     SERV.listen(CONNECTIONS)
     SERV.settimeout(0.5)
-    print(f'Сервер запущен {ADDRES}:{PORT}')
     clients = []
     messages = []
     names = dict()
